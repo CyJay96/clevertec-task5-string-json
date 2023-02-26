@@ -1,0 +1,22 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'ru.clevertec'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+java {
+    withSourcesJar()
+}
