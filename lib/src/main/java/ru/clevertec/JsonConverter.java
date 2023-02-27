@@ -31,10 +31,7 @@ public class JsonConverter {
 
                     if (field.getType().equals(String.class) || field.getType().equals(Character.class)) {
                         json.append("\"").append(fieldValue).append("\",");
-                    } else if (
-                            Number.class.isAssignableFrom(field.getType()) ||
-                                    field.getType().equals(Boolean.class) || field.getType().isPrimitive()
-                    ) {
+                    } else if (isNumberOrBooleanOrPrimitive(field.getType())) {
                         json.append(fieldValue).append(",");
                     } else if (field.getType().isArray() || Iterable.class.isAssignableFrom(field.getType())) {
                         json.append(toJsonArray(fieldValue)).append(",");
@@ -82,15 +79,9 @@ public class JsonConverter {
     }
 
     private static void appendElementToJsonArray(StringBuilder jsonArray, Object value) {
-        if (
-                Number.class.isAssignableFrom(value.getClass()) ||
-                        value.getClass().equals(Boolean.class) || value.getClass().isPrimitive()
-        ) {
+        if (isNumberOrBooleanOrPrimitive(value.getClass())) {
             jsonArray.append(value).append(",");
-        } else if (
-                isNotNavigationPropertyType(value.getClass()) ||
-                        value.getClass().equals(String.class) || value.getClass().equals(Character.class)
-        ) {
+        } else if (value.getClass().equals(String.class) || value.getClass().equals(Character.class)) {
             jsonArray.append("\"").append(value).append("\",");
         } else if (value.getClass().isArray() || Iterable.class.isAssignableFrom(value.getClass())) {
             jsonArray.append(toJsonArray(value)).append(",");
@@ -126,7 +117,7 @@ public class JsonConverter {
                 try {
                     if (field.getType().equals(Character.class)) {
                         field.set(object, value.toString().charAt(0));
-                    } else if (isNotNavigationPropertyType(field.getType())) {
+                    } else if (isNumberOrBooleanOrPrimitive(field.getType()) || field.getType().equals(String.class)) {
                         field.set(object, value);
                     } else {
                         field.set(object, setObjectFields(fieldsValues, field.getType()));
@@ -140,7 +131,7 @@ public class JsonConverter {
         return object;
     }
 
-    private static boolean isNotNavigationPropertyType(Class<?> classType) {
-        return classType.isPrimitive() || classType.getName().startsWith("java.") || classType.equals(String.class);
+    private static boolean isNumberOrBooleanOrPrimitive(Class<?> classType) {
+        return Number.class.isAssignableFrom(classType) || classType.equals(Boolean.class) || classType.isPrimitive();
     }
 }
